@@ -17,7 +17,7 @@ You can always look at the unit tests for examples as well.
 Creates an observable-based obj out of the source obj.
 
 ````
-var mapUtil = pio.ko.util.mapUtil;
+var mapUtil = PIO.ko.util.mapUtil;
 
 var obj = {
 	hi:'there',
@@ -39,7 +39,7 @@ var koObj = mapUtil.build({
 Refreshes models, etc with new data, OR creates a new observable-based obj out of new data.
 
 ````
-var mapUtil = pio.ko.util.mapUtil;
+var mapUtil = PIO.ko.util.mapUtil;
 
 var arrayOfItems = [ {id:1,name:'micah'}, {id:4,name:'jenna'}];
 var preExistingKoArray = ko.observableArray( [ {id:1,name:'micah'}, {id:3, name:'justin'} ]);
@@ -53,6 +53,7 @@ var result = mapUtil.build({
 	//optional
 	//predicate to tell if this is a match
 	//this defaults to function(i,j){ return false; }
+	//in this case, i want to match up my items based upon their "id"
 	predicate:function(i,j){ return i.id()===j.id(); }
 
 	//optional
