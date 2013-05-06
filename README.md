@@ -2,7 +2,7 @@
 
 *requires lodash*
 
-*This item is pre-major release and thus not ready for production use. It is currently in testing and hopes to be major very, very soon. *
+*This item is pre-major release and thus not ready for production use. It is currently in testing and hopes to be major very, very soon.*
 
 ## ko.mapping = no good
 
@@ -13,6 +13,8 @@ One call for create, another for update. What gives?
 You can always look at the unit tests for examples as well.
 
 ### mapUtil.build()
+
+Creates an observable-based obj out of the source obj.
 
 ````
 var mapUtil = pio.ko.util.mapUtil;
@@ -31,9 +33,10 @@ var koObj = mapUtil.build({
 });
 ````
 
-Creates an observable-based obj out of the source obj.
 
 ### mapUtil.map()
+
+Refreshes models, etc with new data, OR creates a new observable-based obj out of new data.
 
 ````
 var mapUtil = pio.ko.util.mapUtil;
