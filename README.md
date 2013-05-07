@@ -14,7 +14,7 @@ You can always look at the unit tests for examples as well. The most important t
 
 ### the options object literal
 
-When calling functions, you always pass in an options objlit like the following example:
+When calling `map()`, you always pass in an options objlit like the following example:
 
 ```js
 {
@@ -30,6 +30,7 @@ When calling functions, you always pass in an options objlit like the following 
 	//this is the important part!
 	//match this to the structure of `source` above to enable settings at every level!
 
+	//the point is-- you can use this to very very specifically set build/map funtionality
 	options:{
 
 		//if i wanted to set options for the friends array
