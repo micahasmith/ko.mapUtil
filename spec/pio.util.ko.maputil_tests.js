@@ -103,6 +103,36 @@ describe("pio.ko.util.maputil", function () {
             expect(t2.child.obs()).toBeUndefined();
         });
 
+        describe('when ignoring',function(){
+            describe("when building",function(){
+                it('ignores array properties',function(){
+                    var d = mapUtil.map({
+                        source: { hi: [1,2,3], there:'micah' },
+                        ignore:['hi']
+                    });
+
+                    expect(d.hi).toBeUndefined();
+                    expect(d.there()).toEqual('micah');
+                });
+
+                it('ignores array properties of an inner objlit',function(){
+                    var d = mapUtil.map({
+                        source: { hi: [{inner1:'prop1',inner2:'prop2'}], there:'micah' },
+                        options:{
+                            hi:{
+                                ignore:'inner1'
+                            }
+                        }
+                    });
+
+                    expect(d.hi()[0].inner1).toBeUndefined();
+                    expect(d.hi()[0].inner2()).toEqual('prop2');
+                    expect(d.there()).toEqual('micah');
+
+                });
+            });
+        });
+
         describe('when calling build() via map() via by default',function(){
             it('can deep copy an array of sub objlits', function () {
                 var d = mapUtil.map({

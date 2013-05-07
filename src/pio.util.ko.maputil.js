@@ -15,14 +15,25 @@ PIO.util.ko.mapUtil = (function (ko, _) {
                     return func(_.defaults({source:source},opts));
                 };
             },
+            shouldIgnore = function(ig,key){
+                if(ig && _.contains(ig,key)) return true;
+                return false;
+            },
+            getSubOptions = function(masterOptions,thisOptions,key){
+                var so = options.options;
+                if(so){
 
-            mapMany = function (opts) {
+                }
+            },
+
+            mapMany = function (opts) { 
             var n = opts.source,
                 d = opts.destination,
                 p = opts.predicate,
                 re = opts.recurse || true,
                 b = opts.builder || function (i) { return i; },
                 m = opts.mapper || mapProxy(opts),
+                ig = opts.ignore,
                 hasPred = Boolean(p),
                 //default predicate?
                 //not sure this would work
@@ -72,9 +83,13 @@ PIO.util.ko.mapUtil = (function (ko, _) {
         this.build = function (options) {
             var o = options.destination || {},
                 s = options.source,
-                re = options.recurse || true;
+                re = options.recurse || true,
+                ig = options.ignore,
+                so = options.options;
 
             _.forEach(s, function (val, key) {
+                if(shouldIgnore(ig,key)) return;
+
                 if (_.isFunction(val)) {
                     //je ne sais
                 } else if (_.isArray(val)) {
@@ -84,7 +99,14 @@ PIO.util.ko.mapUtil = (function (ko, _) {
                     } else {
                         if (re && (_.isObject(val[0]) || _.isPlainObject(val[0]))) {
                             o[key] = ko.observableArray(_.map(val, function (sval) {
-                                return self.build(_.defaults({ source: sval }, options));
+                                if(so)
+                                    return self.build(
+                                        _.defaults(
+                                            _.defaults({ source: sval }, so[key]),
+                                            options)
+                                        );
+                                else
+                                    return self.build(_.defaults({ source: sval }, options));
                             }));
                         } else {
                             o[key] = ko.observableArray(val);
@@ -114,17 +136,20 @@ PIO.util.ko.mapUtil = (function (ko, _) {
                 oItem = options.destination,
                 recurse = Boolean(options.recurse || true),
                 sb = options.build,
-                b = options.builder;
+                b = options.builder,
+                ig = options.ignore,
+                so = options.options;
 
-            //ensure __kom
+            // if we're definitely NOT bulding
             if(sb===false)
-                b = function(i){return i;};
+                b = function(i){i.__kom=true;return i;};
             else
             {
+                //if there's a custom build, still __kom
                 if(options.builder)
                     b = function(o){ var t = options.builder(o); t.__kom=true; return t;};
-                else
-                    b = funcOptsProxy(self.build, _.defaults({oItem:{}},options) );
+                else //use our build
+                    b = funcOptsProxy(self.build, _.defaults({destination:void(0)},options) );
             }
 
 
@@ -132,13 +157,16 @@ PIO.util.ko.mapUtil = (function (ko, _) {
                 (ko.isObservable(nItem) && _.isArray(nItem())))
                 return mapMany(options);
 
-            if(!_.has(nItem,"__kom"))
+            //build if it hasnt been built or if it has no dest
+            if(!_.has(nItem,"__kom") || !oItem)
                 nItem = b(nItem);
 
-            if(!oItem) return b(oItem);
+            //return if there's no mapping to be done
+            if(!oItem) return nItem;
 
             _.forEach(nItem, function (val, key) {
                 if (!_.has(oItem, key)) return;
+                if(shouldIgnore(ig,key)) return;
 
                 var getter, setter,
                     funcGetter = function (f) { return f(); },
@@ -152,8 +180,16 @@ PIO.util.ko.mapUtil = (function (ko, _) {
                     }
                 } else if (_.isObject(val)) {
                     //recurse
-                    if(recurse)
-                        self.map(_.defaults({ source: nItem[key], destination: oItem[key] }, options));
+                    val.__kom = true;
+                    if(recurse){
+                        if(so && so[key]){
+                            _.defaults(
+                                _.defaults({ source: nItem[key], destination: oItem[key] },so[key])
+                                    ,options);
+
+                        } else
+                            self.map(_.defaults({ source: nItem[key], destination: oItem[key] }, options));
+                    }
                 }
 
 
