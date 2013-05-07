@@ -7,9 +7,9 @@ module.exports = function(grunt) {
     meta: {
       version: '0.2.0'
     },
-    banner: '/*! pio.ko.mapping - v<%= meta.version %> - ' +
+    banner: '/*! PIO.ko.util.mapping - v<%= meta.version %> - ' +
       '<%= grunt.template.today("yyyy-mm-dd") %>\n' +
-      '* http://PROJECT_WEBSITE/\n' +
+      '* https://github.com/micahasmith/ko.mapUtil\n' +
       '* Copyright (c) <%= grunt.template.today("yyyy") %> ' +
       'Micah Smith; Licensed MIT */\n',
     // Task configuration.,
@@ -24,7 +24,7 @@ module.exports = function(grunt) {
     },
 
     jasmine: {
-    pivotal: {
+      pivotal: {
         src: 'src/**/*.js',
         options: {
           specs: 'spec/*_tests.js',
@@ -32,6 +32,19 @@ module.exports = function(grunt) {
         }
       }
     },
+
+    concat: {
+    dist: {
+      options: {
+        // Replace all 'use strict' statements in the code with a single one at the top
+        banner: '<%= banner %>',
+      },
+      files: {
+        'dist/pio.ko.util.mapping-<%= meta.version %>.js': ['src/*.js'],
+      },
+    },
+  },
+
     watch: {
       gruntfile: {
         files: '<%= jshint.gruntfile.src %>',
@@ -48,8 +61,9 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
   //grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-jasmine');
+  grunt.loadNpmTasks('grunt-contrib-concat');
 
   // Default task.
-  grunt.registerTask('default', ['jasmine:pivotal:build' ,  'uglify']);
+  grunt.registerTask('default', ['jasmine:pivotal:build' , 'concat' ,'uglify']);
 
 };
