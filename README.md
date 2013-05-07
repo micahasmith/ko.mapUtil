@@ -10,7 +10,9 @@ One call for create, another for update. What gives? Why do i have to manually t
 
 ## ko.mapUtil basics
 
-You can always look at the unit tests for examples as well. The most important thing to know is the `options` object literal which enables very easy usage and customization.
+*Remember--you can always look at the unit tests for further examples as well.*
+
+The most important thing to know is the `options` object literal which enables very easy usage and customization.
 
 ### the options object literal
 
