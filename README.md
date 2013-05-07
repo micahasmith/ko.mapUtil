@@ -4,9 +4,9 @@
 
 *This item is pre-major release and thus not ready for production use. It is currently in testing and hopes to be major very, very soon.*
 
-## ko.mapping = no good
+## ko.mapping === no good. ko.mapUtil === mapping utopia 
 
-One call for create, another for update. What gives? Why do i have to manually track stuff?
+One call for create, another for update. What gives? Why do i have to manually track stuff? Why don't things update and observables get called automatically when i refresh my data from ajax data like i want to?
 
 ## ko.mapUtil basics
 
