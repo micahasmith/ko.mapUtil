@@ -4,9 +4,21 @@
 
 *This item is pre-major release and thus not ready for production use. It is currently in testing and hopes to be major very, very soon.*
 
-## ko.mapping === no good. ko.mapUtil === mapping utopia 
+## ko.mapping === no good
 
 One call for create, another for update. What gives? Why do i have to manually track stuff? Why don't things update and observables get called automatically when i refresh my data from ajax data like i want to?
+
+##ko.mapUtil === mapping utopia 
+
+`ko.mapUtil` has a super simple API that enables customization and mapping at any level of depth in your model. Things it does out of the box:
+
+* can take an object and turn its properties into observable, observableArray, etc
+* can take two objects and map ones properties to another
+* can take two arrays and upsert items, calling observables as it goes
+* can ignore specific properties
+* can call custom constructors/processors before or after turning its properties into observables, etc
+
+And all from the same, super easy API!
 
 ## ko.mapUtil basics
 
