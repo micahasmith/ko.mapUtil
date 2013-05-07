@@ -19,7 +19,7 @@ The `map()` function does it all--refreshes models, etc with new data, OR create
 #### create a knockout-based obj from a plain obj
 
 ```js
-var mapUtil = PIO.ko.util.mapUtil;
+var mapUtil = PIO.util.ko.mapUtil;
 
 var obj = {
 	hi:'there',
@@ -41,7 +41,7 @@ koObj.hi()==="there";
 #### map a single object to another object
 
 ```js
-var mapUtil = PIO.ko.util.mapUtil;
+var mapUtil = PIO.util.ko.mapUtil;
 
 var obj = {
 	hi:ko.observable('there')
@@ -67,7 +67,7 @@ obj2 === koObj;
 #### map an array of objs to another array of objs
 
 ```js
-var mapUtil = PIO.ko.util.mapUtil;
+var mapUtil = PIO.util.ko.mapUtil;
 
 var arrayOfItems = [ {id:1,name:'micah'}, {id:4,name:'jenna'}];
 var preExistingKoArray = ko.observableArray( [ {id:1,name:'micah'}, {id:3, name:'justin'} ]);
