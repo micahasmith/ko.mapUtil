@@ -10,7 +10,42 @@ One call for create, another for update. What gives? Why do i have to manually t
 
 ## ko.mapUtil basics
 
-You can always look at the unit tests for examples as well.
+You can always look at the unit tests for examples as well. The most important thing to know is the `options` object literal which enables very easy usage and customization.
+
+### the options object literal
+
+When calling functions, you always pass in an options objlit like the following example:
+
+```js
+{
+	//required
+	source:{
+		name:'jack',
+		friends:['mary','paul','james']
+	};
+
+	//required only if you want to map from one obj to another
+	destination:{}
+
+	//this is the important part!
+	//match this to the structure of `source` above to enable settings at every level!
+
+	options:{
+
+		//if i wanted to set options for the friends array
+		friends:{
+
+			//see further example below
+			matchPredicate: function(i,j){ return i===j; };
+
+		}
+	}
+
+}
+
+```
+
+See the examples below to see how to use all available settings.
 
 ### mapUtil.map()
 
@@ -27,10 +62,7 @@ var obj = {
 };
 
 var koObj = mapUtil.map({
-	source:obj,
-
-	// optional, defaulted, other options:
-	// recurse:true
+	source:obj
 });
 
 koObj.hi()==="there";
@@ -44,7 +76,7 @@ koObj.hi()==="there";
 var mapUtil = PIO.util.ko.mapUtil;
 
 var obj = {
-	hi:ko.observable('there')
+	hi:'there'
 };
 
 var obj2 = {
@@ -81,7 +113,9 @@ var obj2 = {
 var koObj = mapUtil.map({
 	source:obj,
 	destination:obj2,
-	ignore:["friend"]
+	options:{
+		ignore:["friend"]
+	}
 });
 
 obj2.hi()==="there";
@@ -135,29 +169,121 @@ typeof obj2.subObj.friend === "undefined";
 var mapUtil = PIO.util.ko.mapUtil;
 
 var arrayOfItems = [ {id:1,name:'micah'}, {id:4,name:'jenna'}];
-var preExistingKoArray = ko.observableArray( [ {id:1,name:'micah'}, {id:3, name:'justin'} ]);
+var preExistingKoArray = ko.observableArray( [ 
+	{
+		id:ko.observable(1),
+		name:ko.observable('micah')
+	}, 
+	{
+		id:ko.observable(3), 
+		name:ko.observable('justin')
+	} 
+]);
 
-var result = mapUtil.build({
+var result = mapUtil.map({
 	source:arrayOfItems,
 
 	//this will in the end be the same as the returned result
 	destination: preExistingKoArray
 
-	//optional
-	//predicate to tell if this is a match
-	//this defaults to function(i,j){ return false; }
-	//in this case, i want to match up my items based upon their "id"
-	predicate:function(i,j){ return i.id()===j.id(); }
-
-	//optional
-	//how to build the item, defaults to using the mapUtil.build() func
-	//builder: function(i){ return mapUtil.build(i); }
-
-	// defaulted, other options:
-	// recurse:true
+	options:{
+		//predicate to match existing to new items
+		//this defaults to function(i,j){ return false; }
+		//however in this case, i want to match up my items based upon their "id"
+		matchPredicate:function(i,j){ return i.id()===j.id(); }
+	}
+	
 });
 ```
 
+#### map an array of objs to another array of objs, using my custom obj constructor
+
+```js
+var mapUtil = PIO.util.ko.mapUtil;
+
+var arrayOfItems = [ {id:1,name:'micah'}, {id:4,name:'jenna'}];
+var preExistingKoArray = ko.observableArray( [ 
+	{
+		id:ko.observable(1),
+		name:ko.observable('micah')
+	}, 
+	{
+		id:ko.observable(3), 
+		name:ko.observable('justin')
+	} 
+]);
+
+var result = mapUtil.map({
+	source:arrayOfItems,
+
+	//this will in the end be the same as the returned result
+	destination: preExistingKoArray
+
+	options:{
+		//predicate to match existing to new items
+		//this defaults to function(i,j){ return false; }
+		//however in this case, i want to match up my items based upon their "id"
+		matchPredicate:function(i,j){ return i.id()===j.id(); },
+
+		items:{
+			//a constructor to be called after the item is ko-ifyed
+			postBuilder:function(i){
+				return new Person(i);
+			}
+		}
+	}
+	
+});
+```
+
+
+
+#### map an array of objs to another array of objs, preprocessing AND using my custom obj constructor
+
+```js
+var mapUtil = PIO.util.ko.mapUtil;
+
+var arrayOfItems = [ {id:1,name:'micah'}, {id:4,name:'jenna'}];
+var preExistingKoArray = ko.observableArray( [ 
+	{
+		id:ko.observable(1),
+		name:ko.observable('micah')
+	}, 
+	{
+		id:ko.observable(3), 
+		name:ko.observable('justin')
+	} 
+]);
+
+var result = mapUtil.map({
+	source:arrayOfItems,
+
+	//this will in the end be the same as the returned result
+	destination: preExistingKoArray
+
+	options:{
+		//predicate to match existing to new items
+		//this defaults to function(i,j){ return false; }
+		//however in this case, i want to match up my items based upon their "id"
+		matchPredicate:function(i,j){ return i.id()===j.id(); },
+
+		items:{
+			//a constructor to be called after the item is ko-ifyed
+			postBuilder:function(i){
+				return new Person(i);
+			},
+
+			//a preprocessor against items
+			preBuilder:function(i){
+				//create a nasty bug by changing ids! BWAHAHAHHAHA
+				i.id( i.id()*5 );
+				return i;
+			}
+		}	
+	}
+	
+});
+```
 
 
 

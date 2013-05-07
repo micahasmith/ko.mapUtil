@@ -5,7 +5,7 @@ module.exports = function(grunt) {
   grunt.initConfig({
     // Metadata.
     meta: {
-      version: '0.3.0'
+      version: '0.4.0'
     },
     banner: '/*! PIO.util.ko.maputil - v<%= meta.version %> - ' +
       '<%= grunt.template.today("yyyy-mm-dd") %>\n' +
@@ -34,14 +34,18 @@ module.exports = function(grunt) {
     },
 
     concat: {
-    dist: {
-      options: {
-        // Replace all 'use strict' statements in the code with a single one at the top
-        banner: '<%= banner %>',
-      },
-      files: {
-        'dist/pio.util.ko.maputil-<%= meta.version %>.js': ['src/*.js'],
-      },
+      dist: {
+        options: {
+          // Replace all 'use strict' statements in the code with a single one at the top
+          banner: '<%= banner %>',
+          process: function(src, filepath) {
+            //comment out all console stuff
+            return src.replace(/(console.)/g,"//console.");
+          },
+        },
+        files: {
+          'dist/pio.util.ko.maputil-<%= meta.version %>.js': ['src/*.js'],
+        },
     },
   },
 

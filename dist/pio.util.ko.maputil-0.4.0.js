@@ -1,4 +1,7 @@
-﻿var PIO = PIO || {};
+/*! PIO.util.ko.maputil - v0.4.0 - 2013-05-07
+* https://github.com/micahasmith/ko.mapUtil
+* Copyright (c) 2013 Micah Smith; Licensed MIT */
+var PIO = PIO || {};
 PIO.util = PIO.util || {};
 PIO.util.ko = PIO.util.ko || {};
 PIO.util.ko.mapUtil = (function (ko, _) {
@@ -55,13 +58,13 @@ PIO.util.ko.mapUtil = (function (ko, _) {
                     addIn = [];
 
 
-                console.group("mapMany(): entered on,",opts);
+                //console.group("mapMany(): entered on,",opts);
                 //make sure destination exists
                 if (!d) d = [];
 
                 //make sure destination is obsArray
                 if (!isObsArray(d)){
-                    console.log("mapMany(): making an observableArray of ",d);
+                    //console.log("mapMany(): making an observableArray of ",d);
                     d = ko.observableArray(d);
                 } 
 
@@ -69,11 +72,11 @@ PIO.util.ko.mapUtil = (function (ko, _) {
                     n = ko.utils.unwrapObservable(n);
                 }
 
-                console.log('mapMany(): source is ',n);
+                //console.log('mapMany(): source is ',n);
 
                 //if no predicate, clear the dest, start over
                 if (!hasPred){
-                    console.log("mapMany(): no items, clearing observableArray of ",d);
+                    //console.log("mapMany(): no items, clearing observableArray of ",d);
                     d.removeAll();
                 }
 
@@ -83,7 +86,7 @@ PIO.util.ko.mapUtil = (function (ko, _) {
                 if (d().length) {
                     //foreach item in the source
                     _.forEach(n, function (item) {
-                        console.log('mapMany(): working on new item',item);
+                        //console.log('mapMany(): working on new item',item);
                         //build out the item
                         var bItem = getMapManyBuild({source:item, options:so["items"] || {} });
                         //see if its already in the destination
@@ -101,14 +104,14 @@ PIO.util.ko.mapUtil = (function (ko, _) {
                 } else {
                     //build out an all new list, add it to the dest
                     _(n).forEach(function (i) { 
-                        console.log('mapMany(): working on new item',i);
+                        //console.log('mapMany(): working on new item',i);
                         var bItem = getMapManyBuild({source:i, options:so["items"] || {} });
                         d.push(bItem); 
                     });
                 }
 
-                console.log('mapMany(): returning ',d);
-                console.groupEnd();
+                //console.log('mapMany(): returning ',d);
+                //console.groupEnd();
                 return d;
             };
 
@@ -122,24 +125,24 @@ PIO.util.ko.mapUtil = (function (ko, _) {
                 b1 = so.preBuild,
                 b2 = so.postBuild;
 
-            console.group('build(): entered on ',options);
+            //console.group('build(): entered on ',options);
 
             if(b1){
-                console.log('build(): calling prebuild');
+                //console.log('build(): calling prebuild');
                 o = b1(o);
                 if(!o)
                     throw new Error('prebuild function did not return a value')
             }
 
             _.forEach(s, function (val, key) {
-                console.log('build(): working on ',key,val);
+                //console.log('build(): working on ',key,val);
                 if (shouldIgnore(ig, key)) {
-                    console.log("build(): ignoring ",key);
+                    //console.log("build(): ignoring ",key);
                     return;
                 }
 
                 if (_.isFunction(val) && ko.isWriteableObservable(val)) {
-                    console.log('build(): a function',key);
+                    //console.log('build(): a function',key);
                     o[key] = val;
                     //je ne sais
                 } else if (_.isArray(val)) {
@@ -148,7 +151,7 @@ PIO.util.ko.mapUtil = (function (ko, _) {
                         o[key] = ko.observableArray([]);
                     } else {
                         if (re && (_.isObject(val[0]) || _.isPlainObject(val[0]))) {
-                            console.log('build(): recursing into array items under ',key);
+                            //console.log('build(): recursing into array items under ',key);
                             o[key] = ko.observableArray(_.map(val, function (sval) {
                                 return self.build(
                                     {source:sval, options: so[key] || {}}
@@ -156,33 +159,33 @@ PIO.util.ko.mapUtil = (function (ko, _) {
                             }));
 
                         } else {
-                            console.log('build(): assigning ',key,' value ',val);
+                            //console.log('build(): assigning ',key,' value ',val);
                             o[key] = ko.observableArray(val);
                         }
 
                     }
                 } else if (_.isPlainObject(val) || _.isObject(val)) {
-                    console.log('build(): is object ',key);
+                    //console.log('build(): is object ',key);
                     if (re)
                         o[key] = self.build({source:val, options: so[key] || {}});
                     else
                         o[key] = ko.observable(val);
 
                 } else {
-                    console.log('build(): is primitive ',key);
+                    //console.log('build(): is primitive ',key);
                     o[key] = ko.observable(val);
                 }
 
             });
             o.__kom = true;
             if(b2){
-                console.log('build(): calling postbuild');
+                //console.log('build(): calling postbuild');
                 o = b2(o);
                 if(!o)
                     throw new Error('postbuild function did not return a value')
             }
-            console.log('build():returning ',o);
-            console.groupEnd();
+            //console.log('build():returning ',o);
+            //console.groupEnd();
             return o;
         };
 
@@ -199,36 +202,36 @@ PIO.util.ko.mapUtil = (function (ko, _) {
                 recurse = so.recurse || false,
                 ignore = so.ignore || [];
 
-            console.group("map(): entered on ",options);
+            //console.group("map(): entered on ",options);
 
             if(ignore) ignore.push('__kom');
 
             if (_.isArray(source) ||
                 isObsArray(source))
             {
-                console.log('is an array/observableArray');
+                //console.log('is an array/observableArray');
                 return mapMany(options);
             }
 
             // return if there's no mapping to be done
             // (this was just a build req, no destination)
             if (!oItem) {
-                console.log('map(): just a build request');
+                //console.log('map(): just a build request');
                 return build();
             }
 
             //build the new item first using the appropriate
             //steps
             if (!_.has(source, "__kom")){
-                console.log('map(): doing a prebuild on ',source);
+                //console.log('map(): doing a prebuild on ',source);
                 source = build();
             }
 
             
 
             _.forEach(source, function (val, key) {
-                console.group('map(): working on ',key);
-                console.log('map(): value is ',key,val);
+                //console.group('map(): working on ',key);
+                //console.log('map(): value is ',key,val);
                 if (!_.has(oItem, key)) return;
                 if (shouldIgnore(ignore, key)) return;
 
@@ -238,19 +241,19 @@ PIO.util.ko.mapUtil = (function (ko, _) {
                     funcSetter = function (nv, v) { nv(v); };
 
                 if(isObsArray(val)){
-                    console.log("map(): item is observableArray, calling mapMany on ",key);
+                    //console.log("map(): item is observableArray, calling mapMany on ",key);
                     mapMany({source:val,destination:oItem[key],options:so[key] || {} });
 
                 } else if (_.isFunction(val)) {
                     if (ko.isWriteableObservable(val)) {
-                        console.log('map(): item is observable', key);
+                        //console.log('map(): item is observable', key);
                         getter = funcGetter;
                         setter = funcSetter;
                     }
                 } else if (_.isObject(val)) {
                     //recurse
                     if(recurse){
-                        console.log("map(): is object, recursing on ",key);
+                        //console.log("map(): is object, recursing on ",key);
                         self.map(
                             _.defaults( {source:val,destination:oItem[val]},
                                 {options:so[key] || {}})
@@ -260,14 +263,14 @@ PIO.util.ko.mapUtil = (function (ko, _) {
 
 
                 if (Boolean(getter) && Boolean(setter)) {
-                    console.log('setting one to another');
+                    //console.log('setting one to another');
                     setter(oItem[key], getter(source[key]));
                 }
-                console.groupEnd();
+                //console.groupEnd();
             });
 
-            console.log('map(): returning ',oItem);
-            console.groupEnd();
+            //console.log('map(): returning ',oItem);
+            //console.groupEnd();
             return oItem;
         };
 

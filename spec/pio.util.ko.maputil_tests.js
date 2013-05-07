@@ -1,7 +1,7 @@
 ﻿/// <reference path="../lib/jasmine-1.3.1/jasmine.js" />
 
 
-describe("pio.ko.util.maputil", function () {
+describe("pio.util.ko.maputil", function () {
     var mapUtil = PIO.util.ko.mapUtil;
 
     var TestObj = function(){
@@ -20,231 +20,239 @@ describe("pio.ko.util.maputil", function () {
         expect(mapUtil).toBeDefined();
     });
 
-    describe('build()', function () {
-        describe('when against an obj lit', function () {
-
-            it('can build a string', function () {
-                var d = mapUtil.build({
-                    source: { hi: 'there' },
-                    build:false
-                });
-
-                expect(d.hi()).toEqual('there');
-            });
-            it('can build a number', function () {
-                var d = mapUtil.build({
-                    source: { hi: 4 },
-                    build:false
-                });
-
-                expect(d.hi()).toEqual(4);
-            });
-            it('can build an array of "primatives"', function () {
-                var d = mapUtil.build({
-                    source: { hi: [1,2,3] },
-                    build:false
-                });
-
-                expect(d.hi()).toEqual([1,2,3]);
-            });
-            it('can deep copy an array of sub objlits', function () {
-                var d = mapUtil.build({
-                    source: {
-                        hi: [{ a: { l: 'a' }},{ b: { l: 'b' } }],
-                        there: { how: "are" }
-                    },
-                    build:false
-                });
-
-                expect(d.there.how()).toEqual("are");
-                expect(d.hi()[0].a.l()).toEqual('a');
-                expect(d.hi()[1].b.l()).toEqual('b');
-            });
-        });
-
-    });
-
-    describe('map()', function () {
-        var t1 = new TestObj();
-        var t2 = new TestObj();
-
-        beforeEach(function () {
-            t1 = testObjFactory();
-            t2 = testObjFactory();
-        });
-
-        it("doesnt build when the item was prebuilt (has __kom)",function(){
-            t2.obs('hi');
-            t2.__kom=true;
-            mapUtil.map({ source: t2, destination: t1 });
-            expect(t1.obs()).toEqual('hi');
-            expect(t2.obs()).toEqual('hi');
-        });
-
-        it("maps an observable to an observable", function () {
-            t2.obs('hi');
-            mapUtil.map({ source: t2, destination: t1, build:false });
-            expect(t1.obs()).toEqual('hi');
-            expect(t2.obs()).toEqual('hi');
-        });
-
-        it("maps an observableArray to an observableArray", function () {
-            var ar = [1,2,3,4];
-            t2.obsArray(ar);
-            mapUtil.map({ source: t2, destination: t1, build:false });
-            expect(t1.obsArray()).toEqual(ar);
-            expect(t2.obsArray()).toEqual(ar);
-        });
-
-        it("does not recurse if specified", function () {
-            t2.obs('hi');
-            mapUtil.map({ source: t2, destination: t1, recurse:false, build:false });
-            expect(t1.child.obs()).toBeUndefined();
-            expect(t2.child.obs()).toBeUndefined();
-        });
-
-        describe('when ignoring',function(){
-            describe("when building",function(){
-                it('ignores array properties',function(){
+    describe('map()',function(){
+        
+        describe('when building out ko-enabled objects',function(){
+             describe('when against an obj lit', function () {
+                it('can build a string', function () {
                     var d = mapUtil.map({
-                        source: { hi: [1,2,3], there:'micah' },
-                        ignore:['hi']
+                        source: { hi: 'there' },
                     });
 
-                    expect(d.hi).toBeUndefined();
-                    expect(d.there()).toEqual('micah');
+                    expect(d.hi()).toEqual('there');
+                    expect(d.__kom).toEqual(true);
                 });
-
-                it('ignores array properties of an inner objlit',function(){
+                it('can build a number', function () {
                     var d = mapUtil.map({
-                        source: { hi: [{inner1:'prop1',inner2:'prop2'}], there:'micah' },
+                        source: { hi: 4 },
+                    });
+
+                    expect(d.hi()).toEqual(4);
+                    expect(d.__kom).toEqual(true);
+                });
+                it('can build an array of "primatives"', function () {
+                    var d = mapUtil.map({
+                        source: { hi: [1,2,3] },
+                    });
+
+                    expect(d.hi()).toEqual([1,2,3]);
+                    expect(d.__kom).toEqual(true);
+                });
+                it('can deep copy an array of sub objlits', function () {
+                    var d = mapUtil.map({
+                        source: {
+                            hi: [{ a: { l: 'a' }},{ b: { l: 'b' } }],
+                            there: { how: "are" }
+                        },
+                    });
+
+                    expect(d.there.how()).toEqual("are");
+                    expect(d.hi()[0].a.l()).toEqual('a');
+                    expect(d.hi()[1].b.l()).toEqual('b');
+                    expect(d.__kom).toEqual(true);
+                });
+                it('can call the preBuild function',function(){
+                    var d = mapUtil.map({
+                        source: {
+                            hi: [{ a: { l: 'a' }},{ b: { l: 'b' } }],
+                            there: { how: "are" }
+                        },
                         options:{
-                            hi:{
-                                ignore:'inner1'
+                            preBuild: function(i){
+                                i.meow='kitten';
+                                return i;
                             }
                         }
                     });
 
-                    expect(d.hi()[0].inner1).toBeUndefined();
-                    expect(d.hi()[0].inner2()).toEqual('prop2');
-                    expect(d.there()).toEqual('micah');
+                    expect(d.meow).toEqual('kitten');
 
+                });
+
+                it('can call the postBuild function',function(){
+                    var d = mapUtil.map({
+                        source: {
+                            hi: [{ a: { l: 'a' }},{ b: { l: 'b' } }],
+                            there: { how: "are" }
+                        },
+                        options:{
+                            postBuild: function(i){
+                                i.meow=ko.observable('kitten');
+                                return i;
+                            }
+                        }
+                    });
+
+                    expect(d.meow()).toEqual('kitten');
+
+                });
+
+                it('can ignore a parent-level object',function(){
+                    var d = mapUtil.map({
+                        source: {
+                            hi: [{ a: { l: 'a' }},{ b: { l: 'b' } }],
+                            there: { how: "are" }
+                        },
+                        options:{
+                            ignore:['there']
+                        }
+                    });
+
+                    expect(d.there).toBeUndefined();
+                    expect(d.hi()[0].a.l()).toEqual('a');
+                    expect(d.hi()[1].b.l()).toEqual('b');
+                    expect(d.__kom).toEqual(true);
+                });
+                it('can ignore an n(1)-nested-level object',function(){
+                    var d = mapUtil.map({
+                        source: {
+                            hi: [{ a: { l: 'a' }},{ b: { l: 'b' } }],
+                            there: { how: "are" }
+                        },
+                        options:{
+                            there:{
+                                ignore:['how']
+                            }
+                        }
+                    });
+
+                    expect(d.there.how).toBeUndefined();
+                    expect(d.hi()[0].a.l()).toEqual('a');
+                    expect(d.hi()[1].b.l()).toEqual('b');
+                    expect(d.__kom).toEqual(true);
                 });
             });
         });
 
-        describe('when calling build() via map() via by default',function(){
-            it('can deep copy an array of sub objlits', function () {
-                var d = mapUtil.map({
-                    source: {
-                        hi: [{ a: { l: 'a' }},{ b: { l: 'b' } }],
-                        there: { how: "are" }
-                    }
+        describe('when mapping objects to objects',function(){
+            var t1 = new TestObj();
+            var t2 = new TestObj();
+
+            beforeEach(function () {
+                t1 = testObjFactory();
+                t2 = testObjFactory();
+            });
+
+            describe('when mapping plain objs to ko objs',function(){
+                it("maps flat object's obs and obsArray",function(){
+                    var f1 = {obs:'hi', obsArray:[1,2,3]},
+                        f2 = {obs:ko.observable(),obsArray:ko.observableArray([3,4,5])};
+
+                    mapUtil.map({ source: f1, destination: f2 });
+                    expect(f2.obs()).toEqual('hi');
+                    expect(f2.obsArray()).toEqual([1,2,3]);
                 });
 
-                expect(d.there.how()).toEqual("are");
-                expect(d.hi()[0].a.l()).toEqual('a');
-                expect(d.hi()[1].b.l()).toEqual('b');
+            });
+
+            describe('when mapping mapped to mapped items',function(){
+
+                it("maps from ext to an internally-built, flat object's observables",function(){
+                    var f1 = {obs:ko.observable('hi'), __kom:true},
+                        f2 = {obs:ko.observable(),__kom:true};
+                    mapUtil.map({ source: f1, destination: f2 });
+                    expect(f1.obs()).toEqual('hi');
+                    expect(f2.obs()).toEqual('hi');
+                });
+
+            });
+            
+
+        }); 
+
+        describe('when mapping arrays to arrays',function(){
+            describe('when mapping plain objs to ko objs',function(){
+
+                it("without a predicate, it clears and starts over, mapping flat objects",function(){
+                    var f1 = [{obs:'hi', obsArray:[1,2,3]}],
+                        f2 = ko.observableArray([{obs:ko.observable(),obsArray:ko.observableArray([3,4,5])}]);
+
+                    mapUtil.map({ source: f1, destination: f2 });
+                    expect(f2().length).toEqual(1);
+                    expect(f2()[0].obs()).toEqual('hi');
+                    expect(f2()[0].obsArray()).toEqual([1,2,3]);
+                });
+
+                describe('when using a predicate',function(){
+                    it('adds in items it didnt find',function(){
+                        var f1 = [{obs:'hi', obsArray:[1,2,3]}],
+                            f2 = ko.observableArray([{obs:ko.observable(),obsArray:ko.observableArray([3,4,5])}]);
+
+                        mapUtil.map({ 
+                            source: f1, 
+                            destination: f2,
+                            options:{
+                                matchPredicate:function(i,j){ return i.obs() === j.obs(); }
+                            }
+                        });
+
+                        expect(f2().length).toEqual(2);
+                        expect(f2()[1].obs()).toEqual('hi');
+                        expect(f2()[1].obsArray()).toEqual([1,2,3]);
+
+                    });
+
+                    it('matches and updates items it finds',function(){
+                        var f1 = [{obs:'hi', obsArray:[1,2,3]}],
+                            f2 = ko.observableArray([
+                                {obs:ko.observable('hi'),obsArray:ko.observableArray([3,4,5])},
+                                {obs:ko.observable('there'),obsArray:ko.observableArray([7,8,9])}
+
+                                ]);
+
+                        mapUtil.map({ 
+                            source: f1, 
+                            destination: f2,
+                            options:{
+                                matchPredicate:function(i,j){ return i.obs() === j.obs(); }
+                            }
+                        });
+
+                        expect(f2().length).toEqual(2);
+                        expect(f2()[0].obs()).toEqual('hi');
+                        expect(f2()[0].obsArray()).toEqual([1,2,3]);
+
+                    });
+
+                    it('keeps the unmatched',function(){
+                        var f1 = [{obs:'hi', obsArray:[1,2,3]}],
+                            f2 = ko.observableArray([
+                                {obs:ko.observable('hi'),obsArray:ko.observableArray([3,4,5])},
+                                {obs:ko.observable('there'),obsArray:ko.observableArray([7,8,9])}
+
+                                ]);
+
+                        mapUtil.map({ 
+                            source: f1, 
+                            destination: f2,
+                            options:{
+                                matchPredicate:function(i,j){ return i.obs() === j.obs(); }
+                            }
+                        });
+
+                        expect(f2().length).toEqual(2);
+                        expect(f2()[1].obs()).toEqual('there');
+                        expect(f2()[1].obsArray()).toEqual([7,8,9]);
+
+                    });
+                });
+                
+
             });
 
         });
 
-        describe("when recurse=true", function () {
-            it('does map children', function () {
-                t2.child.obs('hi');
-                mapUtil.map({ source: t2, destination: t1, build:false });
-                expect(t1.child.obs()).toEqual('hi');
-                expect(t2.child.obs()).toEqual('hi');
-            });
-        });
     });
-    describe('mapMany() via map()', function () {
-        var source = [];
-        var dest = ko.observableArray([]);
-        beforeEach(function () {
-            source = [];
-            dest = ko.observableArray([]);
-            for (var i = 0; i < 5; i++){
-                var obj = testObjFactory();
-                obj.obs(i);
-                source.push(obj);
-            }
-        });
-
-        it('maps array to a new array, matching by predicate, using default mapper = map()', function () {
-            mapUtil.map({
-                source: source,
-                destination: dest,
-                build:false,
-                predicate: function (i, j) { return i.obs() === j.obs(); },
-            });
-
-            expect(dest().length).toEqual(source.length);
-            for (var i = 0; i < source.length; i++) {
-                expect(dest()[i].obs()).toEqual(source[i].obs());
-            }
-        });
-
-        describe('when mapping to an array with existing elements', function () {
-            var getTestData = function () {
-                var source = [];
-                var dest = [];
-                for (var i = 0; i < 5; i++) {
-                    var o1 = testObjFactory();
-                    var o2 = testObjFactory();
-                    o1.obs(i);
-                    o2.obs(i);
-                    o2.obsArray([1, 2, 3]);
-                    source.push(o1);
-                    dest.push(o2);
-                }
-                return {
-                    source: source,
-                    dest: ko.observableArray(dest),
-                    build:false
-                };
-            };
-
-            it('matches by predicate, updates elements accordingly, using default mapper = map()', function () {
-                var data = getTestData();
-                var s = data.source;
-                var d = data.dest;
-
-                mapUtil.map({
-                    source: s,
-                    destination: d,
-                    predicate: function (i, j) { return i.obs() === j.obs(); },
-                    build:false
-                });
-
-                for (var i = 0; i < s.length; i++) {
-                    expect(d()[i].obsArray()).toEqual(s[i].obsArray());
-                }
-            });
-
-            it ("adds in items that weren't in the original source", function () {
-                var data = getTestData();
-                var s = data.source;
-                var d = data.dest;
-
-                var extra = testObjFactory();
-                extra.obsArray([4, 5, 6]);
-                s.push(extra);
 
 
-                mapUtil.map({
-                    source: s,
-                    destination: d,
-                    predicate: function (i, j) { return i.obs() === j.obs(); },
-                    build:false
-                });
-
-                for (var i = 0; i < s.length-1; i++) {
-                    expect(d()[i].obsArray()).toEqual(s[i].obsArray());
-            }
-                expect(d()[d().length - 1].obsArray()).toEqual([4, 5, 6]);
-            });
-        });
-
-    });
 });
