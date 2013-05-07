@@ -12,7 +12,7 @@ One call for create, another for update. What gives? Why do i have to manually t
 
 `ko.mapUtil` has a super simple API that enables customization and mapping at any level of depth in your model. Things it does out of the box:
 
-* can take an object and turn its properties into observable, observableArray, etc
+* can take an object and turn its properties into observable, observableArray, etc "ko-ify an object"
 * can take two objects and map ones properties to another
 * can take two arrays and upsert items, calling observables as it goes
 * can ignore specific properties
@@ -39,12 +39,13 @@ When calling `map()`, you always pass in an options objlit like the following ex
 	};
 
 	//required only if you want to map from one obj to another
+	//if you dont provide it, map() will just ko-ify the `source`
 	destination:{}
 
 	//this is the important part!
 	//match this to the structure of `source` above to enable settings at every level!
 
-	//the point is-- you can use this to very very specifically set build/map funtionality
+	//the point is-- you can use this to very very specifically set build/map funtionality, as deep as you want in object
 	options:{
 
 		//if i wanted to set options for the friends array
