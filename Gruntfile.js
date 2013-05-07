@@ -7,7 +7,7 @@ module.exports = function(grunt) {
     meta: {
       version: '0.2.1'
     },
-    banner: '/*! PIO.util.ko.mapping - v<%= meta.version %> - ' +
+    banner: '/*! PIO.util.ko.maputil - v<%= meta.version %> - ' +
       '<%= grunt.template.today("yyyy-mm-dd") %>\n' +
       '* https://github.com/micahasmith/ko.mapUtil\n' +
       '* Copyright (c) <%= grunt.template.today("yyyy") %> ' +
@@ -19,7 +19,7 @@ module.exports = function(grunt) {
       },
       dist: {
         src: 'src/*.js',
-        dest: 'dist/pio.util.ko.mapping.min-<%= meta.version %>.js'
+        dest: 'dist/pio.util.ko.maputil.min-<%= meta.version %>.js'
       }
     },
 
@@ -40,7 +40,7 @@ module.exports = function(grunt) {
         banner: '<%= banner %>',
       },
       files: {
-        'dist/pio.util.ko.mapping-<%= meta.version %>.js': ['src/*.js'],
+        'dist/pio.util.ko.maputil-<%= meta.version %>.js': ['src/*.js'],
       },
     },
   },

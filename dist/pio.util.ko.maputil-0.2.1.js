@@ -1,4 +1,4 @@
-/*! PIO.util.ko.mapping - v0.2.1 - 2013-05-06
+/*! PIO.util.ko.maputil - v0.2.1 - 2013-05-06
 * https://github.com/micahasmith/ko.mapUtil
 * Copyright (c) 2013 Micah Smith; Licensed MIT */
 var PIO = PIO || {};
