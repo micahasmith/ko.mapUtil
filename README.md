@@ -18,7 +18,7 @@ The `map()` function does it all--refreshes models, etc with new data, OR create
 
 #### create a knockout-based obj from a plain obj
 
-````
+```js
 var mapUtil = PIO.ko.util.mapUtil;
 
 var obj = {
@@ -36,11 +36,11 @@ var koObj = mapUtil.map({
 koObj.hi()==="there";
 // -> true
 
-````
+```
 
 #### map a single object to another object
 
-````
+```js
 var mapUtil = PIO.ko.util.mapUtil;
 
 var obj = {
@@ -62,11 +62,11 @@ obj2.hi()==="there";
 obj2 === koObj;
 // -> true
 
-````
+```
 
 #### map an array of objs to another array of objs
 
-````
+```js
 var mapUtil = PIO.ko.util.mapUtil;
 
 var arrayOfItems = [ {id:1,name:'micah'}, {id:4,name:'jenna'}];
@@ -91,7 +91,7 @@ var result = mapUtil.build({
 	// defaulted, other options:
 	// recurse:true
 });
-````
+```
 
 
 
