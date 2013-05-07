@@ -22,23 +22,27 @@ describe("pio.ko.util.maputil", function () {
 
     describe('build()', function () {
         describe('when against an obj lit', function () {
+
             it('can build a string', function () {
                 var d = mapUtil.build({
-                    source: { hi: 'there' }
+                    source: { hi: 'there' },
+                    build:false
                 });
 
                 expect(d.hi()).toEqual('there');
             });
             it('can build a number', function () {
                 var d = mapUtil.build({
-                    source: { hi: 4 }
+                    source: { hi: 4 },
+                    build:false
                 });
 
                 expect(d.hi()).toEqual(4);
             });
             it('can build an array of "primatives"', function () {
                 var d = mapUtil.build({
-                    source: { hi: [1,2,3] }
+                    source: { hi: [1,2,3] },
+                    build:false
                 });
 
                 expect(d.hi()).toEqual([1,2,3]);
@@ -48,7 +52,8 @@ describe("pio.ko.util.maputil", function () {
                     source: {
                         hi: [{ a: { l: 'a' }},{ b: { l: 'b' } }],
                         there: { how: "are" }
-                    }
+                    },
+                    build:false
                 });
 
                 expect(d.there.how()).toEqual("are");
@@ -68,9 +73,17 @@ describe("pio.ko.util.maputil", function () {
             t2 = testObjFactory();
         });
 
+        it("doesnt build when the item was prebuilt (has __kom)",function(){
+            t2.obs('hi');
+            t2.__kom=true;
+            mapUtil.map({ source: t2, destination: t1 });
+            expect(t1.obs()).toEqual('hi');
+            expect(t2.obs()).toEqual('hi');
+        });
+
         it("maps an observable to an observable", function () {
             t2.obs('hi');
-            mapUtil.map({ source: t2, destination: t1 });
+            mapUtil.map({ source: t2, destination: t1, build:false });
             expect(t1.obs()).toEqual('hi');
             expect(t2.obs()).toEqual('hi');
         });
@@ -78,22 +91,38 @@ describe("pio.ko.util.maputil", function () {
         it("maps an observableArray to an observableArray", function () {
             var ar = [1,2,3,4];
             t2.obsArray(ar);
-            mapUtil.map({ source: t2, destination: t1 });
+            mapUtil.map({ source: t2, destination: t1, build:false });
             expect(t1.obsArray()).toEqual(ar);
             expect(t2.obsArray()).toEqual(ar);
         });
 
         it("does not recurse if specified", function () {
             t2.obs('hi');
-            mapUtil.map({ source: t2, destination: t1, recurse:false });
+            mapUtil.map({ source: t2, destination: t1, recurse:false, build:false });
             expect(t1.child.obs()).toBeUndefined();
             expect(t2.child.obs()).toBeUndefined();
+        });
+
+        describe('when calling build() via map() via by default',function(){
+            it('can deep copy an array of sub objlits', function () {
+                var d = mapUtil.map({
+                    source: {
+                        hi: [{ a: { l: 'a' }},{ b: { l: 'b' } }],
+                        there: { how: "are" }
+                    }
+                });
+
+                expect(d.there.how()).toEqual("are");
+                expect(d.hi()[0].a.l()).toEqual('a');
+                expect(d.hi()[1].b.l()).toEqual('b');
+            });
+
         });
 
         describe("when recurse=true", function () {
             it('does map children', function () {
                 t2.child.obs('hi');
-                mapUtil.map({ source: t2, destination: t1 });
+                mapUtil.map({ source: t2, destination: t1, build:false });
                 expect(t1.child.obs()).toEqual('hi');
                 expect(t2.child.obs()).toEqual('hi');
             });
@@ -116,6 +145,7 @@ describe("pio.ko.util.maputil", function () {
             mapUtil.map({
                 source: source,
                 destination: dest,
+                build:false,
                 predicate: function (i, j) { return i.obs() === j.obs(); },
             });
 
@@ -140,7 +170,8 @@ describe("pio.ko.util.maputil", function () {
                 }
                 return {
                     source: source,
-                    dest: ko.observableArray(dest)
+                    dest: ko.observableArray(dest),
+                    build:false
                 };
             };
 
@@ -153,6 +184,7 @@ describe("pio.ko.util.maputil", function () {
                     source: s,
                     destination: d,
                     predicate: function (i, j) { return i.obs() === j.obs(); },
+                    build:false
                 });
 
                 for (var i = 0; i < s.length; i++) {
@@ -174,6 +206,7 @@ describe("pio.ko.util.maputil", function () {
                     source: s,
                     destination: d,
                     predicate: function (i, j) { return i.obs() === j.obs(); },
+                    build:false
                 });
 
                 for (var i = 0; i < s.length-1; i++) {

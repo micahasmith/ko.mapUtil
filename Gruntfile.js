@@ -5,7 +5,7 @@ module.exports = function(grunt) {
   grunt.initConfig({
     // Metadata.
     meta: {
-      version: '0.1.0'
+      version: '0.2.0'
     },
     banner: '/*! pio.ko.mapping - v<%= meta.version %> - ' +
       '<%= grunt.template.today("yyyy-mm-dd") %>\n' +
