@@ -64,6 +64,71 @@ obj2 === koObj;
 
 ```
 
+#### ignore a property while mapping/building
+
+```js
+var mapUtil = PIO.util.ko.mapUtil;
+
+var obj = {
+	hi:ko.observable('there')
+	friend:ko.observable('there')
+};
+
+var obj2 = {
+	hi:ko.observable()
+};
+
+var koObj = mapUtil.map({
+	source:obj,
+	destination:obj2,
+	ignore:["friend"]
+});
+
+obj2.hi()==="there";
+// -> true
+
+typeof obj2.friend === "undefined";
+// -> true
+
+```
+
+#### ignore a deeper property while mapping/building
+
+```js
+var mapUtil = PIO.util.ko.mapUtil;
+
+var obj = {
+	hi:ko.observable('there'),
+	subObj:{
+		friend:ko.observable('there'),
+	}
+};
+
+var obj2 = {
+	hi:ko.observable()
+};
+
+var koObj = mapUtil.map({
+	source:obj,
+	destination:obj2,
+
+	//you make this match the structure of the object
+	//in order to apply rules at this level
+	options:{
+		subObj:{
+			ignore:["friend"]
+		}
+	}
+});
+
+obj2.hi()==="there";
+// -> true
+
+typeof obj2.subObj.friend === "undefined";
+// -> true
+
+```
+
 #### map an array of objs to another array of objs
 
 ```js
