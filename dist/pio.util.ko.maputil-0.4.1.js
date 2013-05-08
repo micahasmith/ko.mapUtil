@@ -1,4 +1,4 @@
-/*! PIO.util.ko.maputil - v0.4.0 - 2013-05-07
+/*! PIO.util.ko.maputil - v0.4.1 - 2013-05-07
 * https://github.com/micahasmith/ko.mapUtil
 * Copyright (c) 2013 Micah Smith; Licensed MIT */
 var PIO = PIO || {};
@@ -126,6 +126,8 @@ PIO.util.ko.mapUtil = (function (ko, _) {
                 b2 = so.postBuild;
 
             //console.group('build(): entered on ',options);
+            if(Boolean(s.__kom))
+                return s;
 
             if(b1){
                 //console.log('build(): calling prebuild');

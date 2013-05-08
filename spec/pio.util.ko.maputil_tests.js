@@ -165,6 +165,20 @@ describe("pio.util.ko.maputil", function () {
                     expect(f2.obs()).toEqual('hi');
                 });
 
+
+                it("reuses the object",function(){
+                    var f1 = {obs:ko.observable('hi')},
+                        f2 = {obs:ko.observable('there'),__kom:true};
+
+                    var m1 = mapUtil.map({source:f1});
+                    m1.__hi = true;
+
+                    mapUtil.map({ source: f2, destination: m1 });
+                    expect(m1.obs()).toEqual('there');
+                    expect(m1.__hi).toEqual(true);
+                    expect(f2.obs()).toEqual('there');
+                });
+
             });
             
 

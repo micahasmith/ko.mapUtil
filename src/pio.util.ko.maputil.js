@@ -123,6 +123,8 @@ PIO.util.ko.mapUtil = (function (ko, _) {
                 b2 = so.postBuild;
 
             console.group('build(): entered on ',options);
+            if(Boolean(s.__kom))
+                return s;
 
             if(b1){
                 console.log('build(): calling prebuild');
