@@ -2,8 +2,6 @@
 
 *requires lodash*
 
-*This item is pre-major release and thus not ready for production use. It is currently in testing and hopes to be major very, very soon.*
-
 ## ko.mapping === no good
 
 One call for create, another for update. What gives? Why do i have to manually track stuff? Why don't things update and observables get called automatically when i refresh my data from ajax data like i want to?
@@ -25,6 +23,8 @@ And all from the same, super easy API!
 *Remember--you can always look at the unit tests for further examples as well.*
 
 The most important thing to know is the `options` object literal which enables very easy usage and customization.
+
+The second most important thing is to **always add read-only computed observables to the ignore list**.
 
 ### the options object literal
 
