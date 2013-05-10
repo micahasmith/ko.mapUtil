@@ -1,4 +1,4 @@
-/*! PIO.util.ko.maputil - v0.4.1 - 2013-05-07
+/*! PIO.util.ko.maputil - v1.0.0 - 2013-05-09
 * https://github.com/micahasmith/ko.mapUtil
 * Copyright (c) 2013 Micah Smith; Licensed MIT */
 var PIO = PIO || {};
@@ -133,7 +133,7 @@ PIO.util.ko.mapUtil = (function (ko, _) {
                 //console.log('build(): calling prebuild');
                 o = b1(o);
                 if(!o)
-                    throw new Error('prebuild function did not return a value')
+                    throw new Error('prebuild function did not return a value');
             }
 
             _.forEach(s, function (val, key) {
@@ -180,6 +180,7 @@ PIO.util.ko.mapUtil = (function (ko, _) {
 
             });
             o.__kom = true;
+            o.__komId = Math.random();
             if(b2){
                 //console.log('build(): calling postbuild');
                 o = b2(o);

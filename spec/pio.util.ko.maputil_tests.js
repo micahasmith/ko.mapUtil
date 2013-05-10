@@ -153,6 +153,9 @@ describe("pio.util.ko.maputil", function () {
                     expect(f2.obsArray()).toEqual([1,2,3]);
                 });
 
+
+
+
             });
 
             describe('when mapping mapped to mapped items',function(){
@@ -166,18 +169,6 @@ describe("pio.util.ko.maputil", function () {
                 });
 
 
-                it("reuses the object",function(){
-                    var f1 = {obs:ko.observable('hi')},
-                        f2 = {obs:ko.observable('there'),__kom:true};
-
-                    var m1 = mapUtil.map({source:f1});
-                    m1.__hi = true;
-
-                    mapUtil.map({ source: f2, destination: m1 });
-                    expect(m1.obs()).toEqual('there');
-                    expect(m1.__hi).toEqual(true);
-                    expect(f2.obs()).toEqual('there');
-                });
 
             });
             
@@ -186,6 +177,29 @@ describe("pio.util.ko.maputil", function () {
 
         describe('when mapping arrays to arrays',function(){
             describe('when mapping plain objs to ko objs',function(){
+                it("reuses the object",function(){
+                    var f1 = {obs:'hi', obsArray:[1,2,3]},
+                        f2 = ko.observableArray([{
+                                obs:ko.observable('hi'),obsArray:ko.observableArray([3,4,5])}
+                                ]),
+                        m1 = {};
+
+                    m1 = mapUtil.map({
+                        source:f1
+                    });
+                    var id = m1.__komId;
+
+                    var res = mapUtil.map({ 
+                        source: f2, 
+                        destination: [m1],
+                        options:{
+                            matchPredicate:function(i,j){ return i.obs() === j.obs(); }
+                        }
+                    });
+
+                    expect(f2().length).toEqual(1);
+                    expect(res()[0].__komId).toEqual(id);
+                });
 
                 it("without a predicate, it clears and starts over, mapping flat objects",function(){
                     var f1 = [{obs:'hi', obsArray:[1,2,3]}],
