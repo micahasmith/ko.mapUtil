@@ -152,14 +152,9 @@ describe("pio.util.ko.maputil", function () {
                     expect(f2.obs()).toEqual('hi');
                     expect(f2.obsArray()).toEqual([1,2,3]);
                 });
-
-
-
-
             });
 
             describe('when mapping mapped to mapped items',function(){
-
                 it("maps from ext to an internally-built, flat object's observables",function(){
                     var f1 = {obs:ko.observable('hi'), __kom:true},
                         f2 = {obs:ko.observable(),__kom:true};
@@ -167,11 +162,58 @@ describe("pio.util.ko.maputil", function () {
                     expect(f1.obs()).toEqual('hi');
                     expect(f2.obs()).toEqual('hi');
                 });
-
-
-
             });
             
+            it('can map deep objects inside arrays',function(){
+                var o1 = {
+                    PriceInfo:{
+                        Price:32,
+                        FormattedPrice:"$32.00"
+                    },
+                    Name:"Item 1"
+                },o2 = {
+                    PriceInfo:{
+                        Price:23,
+                        FormattedPrice:"$23.00"
+                    },
+                    Name:"Item 2"
+                },
+                o11 = {
+                    PriceInfo:{
+                        Price:89,
+                        FormattedPrice:"$89.00"
+                    },
+                    Name:"Item 1"
+                },o22 = {
+                    PriceInfo:{
+                        Price:45,
+                        FormattedPrice:"$45.00"
+                    },
+                    Name:"Item 2"
+                },
+                a1 = [o1,o2],
+                a11 = [o11,o22],
+                ma1 = ko.observableArray([]);
+
+                mapUtil.map({
+                    source:a1,
+                    destination:ma1,
+                    options:{
+                        matchPredicate:function(i,j){ return i.Name()===j.Name();}
+                    }
+                });
+
+
+                expect(ma1().length).toEqual(2);
+                mapUtil.map({
+                    source:a11,
+                    destination:ma1,
+                    options:{
+                        matchPredicate:function(i,j){ return i.Name()===j.Name();}
+                    }
+                });
+                expect(ma1()[0].PriceInfo.Price()).toEqual(89);
+            });
 
         }); 
 

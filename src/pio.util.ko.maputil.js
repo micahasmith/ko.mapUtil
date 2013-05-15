@@ -1,4 +1,4 @@
-﻿var PIO = PIO || {};
+var PIO = PIO || {};
 PIO.util = PIO.util || {};
 PIO.util.ko = PIO.util.ko || {};
 PIO.util.ko.mapUtil = (function (ko, _) {
@@ -199,8 +199,9 @@ PIO.util.ko.mapUtil = (function (ko, _) {
                 build = function() {
                     return self.build({source:source,options:so});
                 },
-                recurse = so.recurse || false,
-                ignore = so.ignore || [];
+                recurse = so.recurse || true,
+                ignore = so.ignore || [],
+                v={};
 
             console.group("map(): entered on ",options);
 
@@ -210,14 +211,18 @@ PIO.util.ko.mapUtil = (function (ko, _) {
                 isObsArray(source))
             {
                 console.log('is an array/observableArray');
-                return mapMany(options);
+                v = mapMany(options);
+                console.groupEnd();
+                return v;
             }
 
             // return if there's no mapping to be done
             // (this was just a build req, no destination)
             if (!oItem) {
                 console.log('map(): just a build request');
-                return build();
+                v = build();
+                console.groupEnd();
+                return v;
             }
 
             //build the new item first using the appropriate
@@ -255,7 +260,7 @@ PIO.util.ko.mapUtil = (function (ko, _) {
                     if(recurse){
                         console.log("map(): is object, recursing on ",key);
                         self.map(
-                            _.defaults( {source:val,destination:oItem[val]},
+                            _.defaults( {source:val,destination:oItem[key]},
                                 {options:so[key] || {}})
                             );
                     }
