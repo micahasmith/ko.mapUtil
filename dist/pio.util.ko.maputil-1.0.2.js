@@ -1,4 +1,4 @@
-/*! PIO.util.ko.maputil - v1.0.1 - 2013-05-15
+/*! PIO.util.ko.maputil - v1.0.2 - 2013-12-10
 * https://github.com/micahasmith/ko.mapUtil
 * Copyright (c) 2013 Micah Smith; Licensed MIT */
 var PIO = PIO || {};
@@ -55,7 +55,8 @@ PIO.util.ko.mapUtil = (function (ko, _) {
                     re = so.recurse || true,
                     ig = so.ignore ,
                     hasPred = Boolean(p),
-                    addIn = [];
+                    addIn = [],
+                    te=[];
 
 
                 //console.group("mapMany(): entered on,",opts);
@@ -99,16 +100,20 @@ PIO.util.ko.mapUtil = (function (ko, _) {
                             addIn.push(bItem);
                     });
                     //add in the add later list
-                    _(addIn).forEach(function (i) { d.push(i); });
+                    //_(addIn).forEach(function (i) { d.push(i); });
 
                 } else {
                     //build out an all new list, add it to the dest
                     _(n).forEach(function (i) { 
                         //console.log('mapMany(): working on new item',i);
                         var bItem = getMapManyBuild({source:i, options:so["items"] || {} });
-                        d.push(bItem); 
+                        addIn.push(bItem); 
                     });
                 }
+                //console.log('mapMany(): addIn is ',addIn);
+
+                te = d().concat(addIn);
+                d(te);
 
                 //console.log('mapMany(): returning ',d);
                 //console.groupEnd();
